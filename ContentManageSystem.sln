@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMS.MentApi", "CMS.MentApi\CMS.MentApi.csproj", "{EE7E9408-4BF8-419D-8546-54F811D89199}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMS.MentApi", "CMS.MentApi\CMS.MentApi.csproj", "{46EAE1E1-139E-4B43-B248-D55BEDCE664D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EE7E9408-4BF8-419D-8546-54F811D89199}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EE7E9408-4BF8-419D-8546-54F811D89199}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EE7E9408-4BF8-419D-8546-54F811D89199}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EE7E9408-4BF8-419D-8546-54F811D89199}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46EAE1E1-139E-4B43-B248-D55BEDCE664D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46EAE1E1-139E-4B43-B248-D55BEDCE664D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46EAE1E1-139E-4B43-B248-D55BEDCE664D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46EAE1E1-139E-4B43-B248-D55BEDCE664D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
