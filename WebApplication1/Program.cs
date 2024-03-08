@@ -1,5 +1,5 @@
 
-namespace CMS.MentApi
+namespace WebApplication1
 {
     public class Program
     {
@@ -7,7 +7,7 @@ namespace CMS.MentApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the cont
+            // Add services to the container.
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
