@@ -1,0 +1,6 @@
+@CMS.MentApi_HostAddress = http://localhost:5274
+
+GET {{CMS.MentApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
