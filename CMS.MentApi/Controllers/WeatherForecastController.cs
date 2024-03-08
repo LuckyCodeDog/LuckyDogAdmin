@@ -1,9 +1,13 @@
+using CMS.MentApi.Untility.SwaggerExt;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CMS.MentApi.Controllers
-{
+{/// <summary>
+/// test controller
+/// </summary>
     [ApiController]
     [Route("[controller]")]
+    [ApiExplorerSettings(IgnoreApi = false, GroupName = nameof(ApiVersions.v1))]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -19,6 +23,8 @@ namespace CMS.MentApi.Controllers
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
+
+
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast

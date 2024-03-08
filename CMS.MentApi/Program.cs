@@ -1,4 +1,8 @@
 
+using CMS.MentApi.Untility.SwaggerExt;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+
 namespace CMS.MentApi
 {
     public class Program
@@ -11,18 +15,15 @@ namespace CMS.MentApi
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
+            builder.AddSwaggerExt();
             var app = builder.Build();
-
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
-            }
 
+                app.UseSwaggerExt();
+            }
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
