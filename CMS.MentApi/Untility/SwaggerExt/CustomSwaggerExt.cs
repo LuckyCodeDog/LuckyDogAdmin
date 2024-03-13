@@ -1,7 +1,9 @@
 ﻿using Microsoft.OpenApi.Models;
 
 namespace CMS.MentApi.Untility.SwaggerExt
-{
+{/// <summary>
+/// to config swagger
+/// </summary>
     public static class CustomSwaggerExt
     {
         public static void AddSwaggerExt(this WebApplicationBuilder builder)

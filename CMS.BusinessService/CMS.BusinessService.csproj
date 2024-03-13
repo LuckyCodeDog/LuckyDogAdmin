@@ -1,23 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="SqlSugarCore" Version="5.1.4.145" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CMS.BusinessInterface\CMS.BusinessInterface.csproj" />
-    <ProjectReference Include="..\CMS.BusinessService\CMS.BusinessService.csproj" />
-    <ProjectReference Include="..\CMS.Common\CMS.Common.csproj" />
-    <ProjectReference Include="..\CMS.DTO\CMS.DTO.csproj" />
     <ProjectReference Include="..\CMS.Models\CMS.Models.csproj" />
   </ItemGroup>
 
