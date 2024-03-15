@@ -86,20 +86,20 @@ namespace CMS.BusinessInterface
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
-        void Update<T>(T entity) where T : class, new();
+        bool Update<T>(T entity) where T : class, new();
         /// <summary>
         /// update a entity async and commit
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task UpdateAsync<T>(T entity) where T : class, new();
+        Task<bool> UpdateAsync<T>(T entity) where T : class, new();
         /// <summary>
         /// update a entity list
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="tList"></param>
-        void UpdateList<T>(List<T> tList) where T : class, new();
+        bool UpdateList<T>(List<T> tList) where T : class, new();
         #endregion
 
         #region Delete

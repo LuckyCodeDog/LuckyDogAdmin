@@ -6,13 +6,12 @@ namespace CMS.Models.Entity
     ///  用户信息
     /// </summary>
     [SugarTable("Sys_User")]
-    public class Sys_User
+    public class Sys_User : Sys_BaseModel
     {
         [SugarColumn(ColumnName = "UserId", IsIdentity = true, IsPrimaryKey = true)]
         public int UserId { get; set; }
 
         public string? Name { set; get; }
-
         public string? Password { set; get; }
 
         /// <summary>
@@ -34,6 +33,7 @@ namespace CMS.Models.Entity
 
         public int Sex { set; get; }
 
-        public DateTime LastLoginTime { set; get; }
+        public string? ImageUrl { set; get; }
+        public DateTime? LastLoginTime { set; get; } = DateTime.Now;
     }
 }

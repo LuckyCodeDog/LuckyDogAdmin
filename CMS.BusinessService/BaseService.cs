@@ -12,7 +12,7 @@ namespace CMS.BusinessService
     {
 
 
-        private ISqlSugarClient _client;
+        protected ISqlSugarClient _client;
         public BaseService(ISqlSugarClient client)
         {
             _client = client;
@@ -82,19 +82,19 @@ namespace CMS.BusinessService
 
         #region Update
 
-        public void Update<T>(T entity) where T : class, new()
+        public bool Update<T>(T entity) where T : class, new()
         {
-            _client.Updateable<T>(entity).ExecuteCommand();
+            return _client.Updateable<T>(entity).ExecuteCommandHasChange();
         }
 
-        public async Task UpdateAsync<T>(T entity) where T : class, new()
+        public async Task<bool> UpdateAsync<T>(T entity) where T : class, new()
         {
-            await _client.Updateable<T>(entity).ExecuteCommandAsync();
+            return await _client.Updateable<T>(entity).ExecuteCommandHasChangeAsync();
         }
 
-        public void UpdateList<T>(List<T> tList) where T : class, new()
+        public bool UpdateList<T>(List<T> tList) where T : class, new()
         {
-            _client.Updateable<T>(tList).ExecuteCommand();
+            return _client.Updateable<T>(tList).ExecuteCommandHasChange();
         }
         #endregion
 

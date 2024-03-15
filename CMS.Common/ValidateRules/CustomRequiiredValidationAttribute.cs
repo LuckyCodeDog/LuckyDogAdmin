@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace CMS.Common.ValidateRules
 {
-    public class CustomRequiiredValidation : BaseValidateAtrribute
+    public class CustomRequiiredValidationAttribute : BaseValidateAtrribute
     {
-        public CustomRequiiredValidation(string message) : base(message)
+        public CustomRequiiredValidationAttribute(string message) : base(message)
         {
         }
 
         public override (bool, string?) DoValidate(object oValue)
         {
-            return oValue == null ? (false, Message) : (true, "");
+            return oValue == null || oValue?.ToString()?.Length == 0 ? (false, Message) : (true, "");
         }
     }
 }

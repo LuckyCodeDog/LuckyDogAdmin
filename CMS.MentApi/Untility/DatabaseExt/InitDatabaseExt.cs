@@ -69,10 +69,13 @@ namespace CMS.MentApi.Untility.DatabaseExt
                                 menuList.Add(button);
                             }
                         }
-                        //inset  menu and buttons info into data base
-                        sqlSugarClient.Insertable(menuList).ExecuteCommand();
                     }
                 }
+                //inset  menu and buttons info into data base
+
+
+                sqlSugarClient.Insertable(menuList).ExecuteCommand();
+
             }
 
 

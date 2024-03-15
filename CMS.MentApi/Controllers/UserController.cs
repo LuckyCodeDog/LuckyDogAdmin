@@ -10,7 +10,7 @@ using CMS.DTO;
 using CMS.MentApi.Untility.Filters;
 using CMS.MentApi.Untility.DatabaseExt;
 using System.Linq.Expressions;
-using System.Net.NetworkInformation;
+using CMS.Common.UserStateEnum;
 namespace CMS.MentApi.Controllers
 {
     /// <summary>
@@ -36,34 +36,9 @@ namespace CMS.MentApi.Controllers
             _mapper = mapper;
         }
 
-        /// <summary>
-        /// get a user by id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-
-        [HttpGet("{id}")]
-        [MenuOrButton(MenuType.Button, "Find User")]
-        public IActionResult Get(int id)
-        {
 
 
-            Sys_User user = _userManageService.Find<Sys_User>(id);
-            return new JsonResult(new ApiResult<Sys_User>()
-            {
-                Data = user,
-                Message = user == null ? " user not fount" : null,
-            });
-        }
 
-
-        [HttpDelete]
-        [CustomValidationActionFilter]
-        [MenuOrButton(MenuType.Button, "Delete User")]
-        public IActionResult Delete(Sys_UserDto user)
-        {
-            return Ok(user);
-        }
         /// <summary>
         /// 
         /// </summary>
@@ -72,9 +47,10 @@ namespace CMS.MentApi.Controllers
         /// <param name="searchByName"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("{pageindex:int}/{pageSize:int}/{searchaString}")]
-        [Route("{pageindex:int}/{pageSize:int}")]
-        [MenuOrButton(MenuType.Button, "Query User info")]
+        [Route("{pageIndex:int}/{pageSize:int}/{searchByName}")]
+        [Route("{pageIndex:int}/{pageSize:int}")]
+        [MenuOrButton(MenuType.Button, " User")]
+
         public async Task<JsonResult> PageQuery(int pageIndex, int pageSize, string? searchByName = null)
         {
             //if search words is null or not 
@@ -82,11 +58,11 @@ namespace CMS.MentApi.Controllers
             Expression<Func<Sys_User, bool>> funcWhere;
             if (string.IsNullOrEmpty(searchByName))
             {
-                funcWhere = null;
+                funcWhere = s => s.IsDeleted == false;
             }
             else
             {
-                funcWhere = s => s.Name.Contains(searchByName);
+                funcWhere = s => s.Name.Contains(searchByName) && s.IsDeleted == false;
             }
             PagingData<Sys_User> pagingData = _userManageService.QueryPage<Sys_User>(funcWhere, pageSize, pageIndex, s => s.UserId);
             // map to dto 
@@ -97,6 +73,86 @@ namespace CMS.MentApi.Controllers
                 Message = "returned paging result",
                 OValue = null
             }));
+        }
+
+        /// <summary>
+        /// Add user
+        /// </summary>
+        /// <param name="userDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [CustomValidationActionFilter]
+        [MenuOrButton(MenuType.Button, "Add User")]
+        public async Task<JsonResult> Add(Sys_UserDto userDto)
+        {
+            Sys_User user = _mapper.Map<Sys_User>(userDto);
+            Sys_User returnedUser = await _userManageService.InsertAsync<Sys_User>(user);
+            Sys_UserDto returnedUserDto = _mapper.Map<Sys_UserDto>(returnedUser);
+            return new JsonResult(new ApiResult<Sys_UserDto>()
+            {
+                Data = returnedUserDto,
+                Success = true,
+                Message = $"successfully add user: {returnedUserDto.Name}"
+            });
+        }
+
+
+        /// <summary>
+        /// to freeze or activate user
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <returns></returns>
+        [HttpPut("{userid:int}")]
+        [CustomValidationActionFilter]
+        [MenuOrButton(MenuType.Button, "Freeze or Activate User")]
+        public async Task<JsonResult> HandleUserFreeze(int userid)
+        {
+            Sys_User userToHandle = await _userManageService.FindAsync<Sys_User>(userid);
+            if (userToHandle != null)
+            {
+                userToHandle.Status = userToHandle.Status == (int)UserStateEnum.Active ? (int)UserStateEnum.Fronzen : (int)UserStateEnum.Active;
+                await _userManageService.UpdateAsync<Sys_User>(userToHandle);
+
+                return new JsonResult(new ApiResult()
+                {
+                    Message = "user status has changed",
+                    Success = true,
+                });
+            }
+
+            return new JsonResult(new ApiResult()
+            {
+                Message = "failed to cahnge state",
+                Success = false,
+            });
+        }
+
+        /// <summary>
+        /// delete user set isdeletd  = true
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("{userId:int}")]
+        [MenuOrButton(MenuType.Button, "Delete User")]
+        public async Task<JsonResult> Delete(int userId)
+        {
+
+            bool success = await _userManageService.Delete(userId);
+            ApiResult result = new ApiResult()
+            {
+                Message = "cont find user, failed to delete",
+                Success = success,
+            };
+
+            if (success)
+            {
+                result.Message = "Deleted User Successfully";
+                return new JsonResult(result);
+
+            }
+            return new JsonResult(result);
+
         }
     }
 }

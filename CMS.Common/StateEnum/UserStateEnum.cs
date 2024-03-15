@@ -4,10 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CMS.BusinessInterface
+namespace CMS.Common.UserStateEnum
 {
-    public interface IUserManageService : IBusinessService
+    public enum UserStateEnum
     {
-        Task<bool> Delete(int userId);
+        Active = 0,
+
+        Fronzen = 1,
+
+        Deleted = 2,
     }
 }
