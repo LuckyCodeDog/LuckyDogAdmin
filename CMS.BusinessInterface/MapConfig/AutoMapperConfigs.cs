@@ -16,9 +16,15 @@ namespace CMS.BusinessInterface.MapConfig
 
             CreateMap<Sys_User, Sys_UserDto>().ReverseMap();
 
-
             CreateMap<PagingData<Sys_User>, PagingData<Sys_UserDto>>().ReverseMap();
 
+            CreateMap<Sys_Role, Sys_RoleDto>().ReverseMap();
+
+            CreateMap<PagingData<Sys_Role>, PagingData<Sys_RoleDto>>().ReverseMap();
+
+            CreateMap<PagingData<Sys_Menu>, PagingData<SysMenuDTO>>().ReverseMap();
+
+            CreateMap<Sys_Menu,SysMenuDTO>().ReverseMap();  
 
         }
     }

@@ -11,26 +11,29 @@ using CMS.MentApi.Untility.Filters;
 using CMS.MentApi.Untility.DatabaseExt;
 using System.Linq.Expressions;
 using CMS.Common.UserStateEnum;
+using SqlSugar;
+using CMS.Common.Enum;
 namespace CMS.MentApi.Controllers
 {
     /// <summary>
     /// user 
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("api/[controller]/")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = false, GroupName = nameof(ApiVersions.v1))]
     [CustomExceptionFilter]
-    [MenuOrButton(MenuType.Menu, "User Management")]
+    [Function(MenuType.Menu, "User Management", "/user/info", "../views/Home/user/index.vue")]
     public class UserController : ControllerBase
     {
-        private IUserManageService _userManageService;
+        private IUserService _userManageService;
 
         private readonly IMapper _mapper;
+
         /// <summary>
         /// inject service
         /// </summary>
         /// <param name="userManageService"></param>
-        public UserController(IUserManageService userManageService, IMapper mapper)
+        public UserController(IUserService userManageService, IMapper mapper)
         {
             _userManageService = userManageService;
             _mapper = mapper;
@@ -49,7 +52,7 @@ namespace CMS.MentApi.Controllers
         [HttpGet]
         [Route("{pageIndex:int}/{pageSize:int}/{searchByName}")]
         [Route("{pageIndex:int}/{pageSize:int}")]
-        [MenuOrButton(MenuType.Button, " User")]
+        [Function(MenuType.Button, "Page Query Users")]
 
         public async Task<JsonResult> PageQuery(int pageIndex, int pageSize, string? searchByName = null)
         {
@@ -82,7 +85,7 @@ namespace CMS.MentApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [CustomValidationActionFilter]
-        [MenuOrButton(MenuType.Button, "Add User")]
+        [Function(MenuType.Button, "Add User")]
         public async Task<JsonResult> Add(Sys_UserDto userDto)
         {
             Sys_User user = _mapper.Map<Sys_User>(userDto);
@@ -104,25 +107,25 @@ namespace CMS.MentApi.Controllers
         /// <returns></returns>
         [HttpPut("{userid:int}")]
         [CustomValidationActionFilter]
-        [MenuOrButton(MenuType.Button, "Freeze or Activate User")]
+        [Function(MenuType.Button, "Freeze or Activate User")]
         public async Task<JsonResult> HandleUserFreeze(int userid)
         {
             Sys_User userToHandle = await _userManageService.FindAsync<Sys_User>(userid);
             if (userToHandle != null)
             {
-                userToHandle.Status = userToHandle.Status == (int)UserStateEnum.Active ? (int)UserStateEnum.Fronzen : (int)UserStateEnum.Active;
+                userToHandle.Status = userToHandle.Status == (int)ActiveStateEnum.Active ? (int)ActiveStateEnum.Fronzen : (int)ActiveStateEnum.Active;
                 await _userManageService.UpdateAsync<Sys_User>(userToHandle);
-
+                string finalStatus = userToHandle.Status == 0 ? "Activeated" : "Fronzen";
                 return new JsonResult(new ApiResult()
                 {
-                    Message = "user status has changed",
+                    Message = $@"user: {userToHandle.Name} status has {finalStatus}",
                     Success = true,
                 });
             }
 
             return new JsonResult(new ApiResult()
             {
-                Message = "failed to cahnge state",
+                Message = $@"failed to cahnge user: {userToHandle?.Name} Status ",
                 Success = false,
             });
         }
@@ -134,7 +137,7 @@ namespace CMS.MentApi.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("{userId:int}")]
-        [MenuOrButton(MenuType.Button, "Delete User")]
+        [Function(MenuType.Button, "Delete User")]
         public async Task<JsonResult> Delete(int userId)
         {
 
@@ -153,6 +156,102 @@ namespace CMS.MentApi.Controllers
             }
             return new JsonResult(result);
 
+        }
+
+        /// <summary>
+        /// get user`s roles with selected
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="userRoleMenuServicce"></param>
+        /// <param name="userRoleMapService"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{userId:int}")]
+        [Function(MenuType.Button, "Get User`s Role")]
+        public async Task<JsonResult> GetUserRole(int userId, [FromServices] IRoleServicce userRoleMenuServicce, [FromServices] IUserRoleMapService userRoleMapService)
+        {
+            // get all roles_name and roles_id  in role_table and put them in UserRoleMap formy
+            List<Sys_Role> totalRoles = userRoleMenuServicce.Set<Sys_Role>().Where(r=>r.IsDeleted !=true ).ToList();
+
+            // to tell if  it is selected by the user 
+
+            //get  role_ids  in user_role_map table by userId
+            List<int> selectedRoleId = userRoleMapService.Query<Sys_UserRoleMap>(u => u.UserId == userId).Select(u => u.RoleId).ToList();
+            //get selected role names  from role_table by roles is from above result 
+            List<String> selectedRoleNmaes = new List<string>();
+            if (selectedRoleId.Count > 0)
+            {
+                foreach (int roleId in selectedRoleId)
+                {
+                    Sys_Role selectedRole = await userRoleMenuServicce.FindAsync<Sys_Role>(roleId);
+                    selectedRoleNmaes.Add(selectedRole.RoleName);
+                }
+
+            }
+            List<UserRoleInfoDto> finalResult = totalRoles.Select(r => new UserRoleInfoDto()
+            {
+                role_id = r.RoleId,
+                role_name = r.RoleName,
+                selected = selectedRoleNmaes.Any(n => n == r.RoleName),
+                user_id = userId,
+            }).ToList();
+
+            return new JsonResult(new ApiResult<List<UserRoleInfoDto>>
+            {
+                Data = finalResult,
+                Message = "user  role info with selected roles",
+                Success = true
+            });
+
+
+
+            //form user role map dto result from above
+
+
+        }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="userRoleInfo"></param>
+      /// <param name="userRoleMapService"></param>
+      /// <param name="userRoleMenuServicce"></param>
+      /// <returns></returns>
+      /// <exception cref="Exception"></exception>
+        [HttpPost("/api/User/HandleRoles")]
+        [Function(MenuType.Button,"Set Roles")]
+        public async Task<JsonResult> HandleRoles(List<UserRoleInfoDto> userRoleInfo, [FromServices] IUserRoleMapService userRoleMapService, [FromServices] IRoleServicce userRoleMenuServicce)
+        {
+            //validate if they are all in db 
+            if (userRoleInfo.Count <= 0 || userRoleInfo.Any(u => u.role_id <= 0)) throw new Exception("params are in validate");
+            List<int> roleIds = userRoleInfo.Where(u => u.selected == true).Select(u => u.role_id).ToList();
+
+
+            foreach (int roleId in roleIds)
+            {
+                Sys_Role role = await userRoleMenuServicce.FindAsync<Sys_Role>(roleId);
+                if (role == null || role.RoleId <= 0)
+                {
+                    throw new Exception("cant find  this role ");
+                }
+            }
+            ApiResult result = new ApiResult()
+            {
+                Message = "failed to handle roles",
+                Success = false,
+            };
+
+            int userId = userRoleInfo.FirstOrDefault().user_id;
+            //
+            bool success = await userRoleMapService.HandleUserRoles(roleIds, userId);
+
+            if (success)
+            {
+                result.Success = true;
+                result.Message = "successfully to handle roles";
+                return new JsonResult(result);
+            }
+            return new JsonResult(result);
         }
     }
 }

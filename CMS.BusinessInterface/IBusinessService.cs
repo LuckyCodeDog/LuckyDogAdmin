@@ -124,7 +124,7 @@ namespace CMS.BusinessInterface
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="tList"></param>
-        void DeleteList<T>(List<T> tList) where T : class, new();
+        bool DeleteList<T>(List<T> tList) where T : class, new();
         #endregion
 
         #region  sql

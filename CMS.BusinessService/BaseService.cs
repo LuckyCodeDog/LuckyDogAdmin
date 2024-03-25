@@ -73,9 +73,9 @@ namespace CMS.BusinessService
             return await _client.Deleteable(t).ExecuteCommandHasChangeAsync();
         }
 
-        public void DeleteList<T>(List<T> tList) where T : class, new()
+        public bool DeleteList<T>(List<T> tList) where T : class, new()
         {
-            _client.Deleteable<T>(tList).ExecuteCommandHasChange();
+            return _client.Deleteable<T>(tList).ExecuteCommandHasChange();
         }
 
         #endregion

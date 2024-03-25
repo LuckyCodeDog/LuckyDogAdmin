@@ -37,7 +37,12 @@ namespace CMS.MentApi.Untility.DatabaseExt
                 };
                 client.Aop.OnExecutingChangeSql = (s, p) =>
                 {
-                    Console.WriteLine($"OnLogExecuting:输出Sql语句:{s} || 参数为：{string.Join(",", p.Select(p => p.Value))}");
+                    if (p != null)
+                    {
+                        Console.WriteLine($"OnLogExecuting:输出Sql语句:{s} || 参数为：{string.Join(",", p.Select(p => p?.Value))}");
+                    }
+
+
                     return new KeyValuePair<string, SugarParameter[]>(s, p);
                 };
                 client.Aop.OnLogExecuted = (s, p) =>

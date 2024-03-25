@@ -1,0 +1,15 @@
+在业务层和数据访问层的 course 和student 重合太多：
+
+解决方法： 使用一个 基本接口定义方法， 然后用一个基类去实现 基本的接口，处于业务层和数据访问层的course 和student 分别继承 ，这个实现了接口的基类
+
+再定义 IcourseService ， IStudentService  和ICourseStore ， IStudentStore接口 
+
+为类扩展方法
+
+
+
+ 目标给系统添加鉴权与授权
+
+用户的角色分别为 admin  和student
+
+第一步添加数据模型 数据库迁移
