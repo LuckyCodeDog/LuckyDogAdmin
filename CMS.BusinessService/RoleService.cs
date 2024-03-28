@@ -1,5 +1,6 @@
 ﻿using CMS.BusinessInterface;
 using CMS.Common.Enum;
+using CMS.Common.UserStateEnum;
 using CMS.DTO;
 using CMS.Models.Entity;
 using SqlSugar;
@@ -234,6 +235,16 @@ namespace CMS.BusinessService
                 return false;
             }
 
+        }
+
+        public async Task<bool> SetStatus(int roleId)
+        {
+
+            if (roleId <= 0) throw new Exception("Invalidate role id ");
+            Sys_Role roleToHandle =     await this.FindAsync<Sys_Role>(roleId);
+            if (roleToHandle == null) throw new Exception($"Did not find any user with id={roleId}");
+            roleToHandle.Status = roleToHandle.Status == (int)ActiveStateEnum.Fronzen ? (int)ActiveStateEnum.Active :(int) ActiveStateEnum.Fronzen;
+             return  await this.UpdateAsync(roleToHandle);
         }
     }
 

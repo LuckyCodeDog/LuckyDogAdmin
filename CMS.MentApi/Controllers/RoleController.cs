@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using CMS.BusinessInterface;
 using CMS.BusinessService;
+using CMS.Common.DTO;
+using CMS.Common.DTO.user;
 using CMS.Common.Enum;
 using CMS.Common.Result;
 using CMS.DTO;
@@ -8,6 +10,7 @@ using CMS.MentApi.Untility.DatabaseExt;
 using CMS.MentApi.Untility.Filters;
 using CMS.MentApi.Untility.SwaggerExt;
 using CMS.Models.Entity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
 using System.Linq.Expressions;
@@ -130,7 +133,7 @@ namespace CMS.MentApi.Controllers
 
 
         /// <summary>
-        /// 
+        /// page query users 
         /// </summary>
         /// <param name="userManageService"></param>
         /// <param name="mapper"></param>
@@ -230,6 +233,27 @@ namespace CMS.MentApi.Controllers
                 Message = resuult == true ? "Assign Users Successfully." : "Failed to Set Users."
             };
             return await Task.FromResult(new JsonResult(result));
+        }
+
+
+        /// <summary>
+        /// set role status
+        /// </summary>
+        /// <param name="roleServicce"></param>
+        /// <param name="rolId"></param>
+        /// <returns></returns>
+        [HttpPatch("/api/Role/SetStatus/{rolId:int}")]
+        public async Task<JsonResult> SetStatus([FromServices]IRoleServicce roleServicce,int rolId)
+           
+        {
+
+            bool result =  await   roleServicce.SetStatus(rolId);
+            ApiResult apiResult = new ApiResult()
+            {
+                Success = result,
+                Message = result ? "Set Status Successfully" : "Falied to Set Status"
+            };
+            return  await Task.FromResult(new JsonResult(apiResult));
         }
     }
 }

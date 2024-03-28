@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.3" />
     <PackageReference Include="SqlSugarCore" Version="5.1.4.145" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
@@ -17,7 +18,6 @@
     <ProjectReference Include="..\CMS.BusinessInterface\CMS.BusinessInterface.csproj" />
     <ProjectReference Include="..\CMS.BusinessService\CMS.BusinessService.csproj" />
     <ProjectReference Include="..\CMS.Common\CMS.Common.csproj" />
-    <ProjectReference Include="..\CMS.DTO\CMS.DTO.csproj" />
     <ProjectReference Include="..\CMS.Models\CMS.Models.csproj" />
   </ItemGroup>
 

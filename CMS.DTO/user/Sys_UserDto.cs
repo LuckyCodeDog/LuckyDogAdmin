@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CMS.Common;
 using CMS.Common.ValidateRules;
 using Zhaoxi.Manage.Common.ValidateRules;
-namespace CMS.DTO
+namespace CMS.DTO.user
 {
     /// <summary>
     ///  user dto
@@ -14,7 +14,7 @@ namespace CMS.DTO
     public class Sys_UserDto
     {
         public int? UserId { get; set; }
-        [CustomRequiiredValidationAttribute("user name can not be null")]
+        [CustomRequiiredValidation("user name can not be null")]
         public string? Name { set; get; }
 
         [CustomPasssWordValidation("Password`s length needs to be >=6.")]
