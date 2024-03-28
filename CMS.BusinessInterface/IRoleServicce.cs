@@ -17,5 +17,7 @@ namespace CMS.BusinessInterface
 
 
         Task<bool> AssignUsers(int roleId, List<int> userIds);
+
+        Task<bool> SetStatus(int roleId); 
     }
 }

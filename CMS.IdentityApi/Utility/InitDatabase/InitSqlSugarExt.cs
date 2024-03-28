@@ -58,9 +58,11 @@ namespace CMS.MentApi.Untility.DatabaseExt
                 };
 
                 {
-                    //可以配置对于数据库操作的过滤器--SqlSugar特有的
-                    client.QueryFilter.AddTableFilter<Sys_User>(user => !user.IsDeleted);
-                    client.QueryFilter.AddTableFilter<Sys_Role>(role=> !role.IsDeleted);
+                    client.QueryFilter.AddTableFilter<Sys_Menu>(it => it.IsDeleted == false);
+                    client.QueryFilter.AddTableFilter<Sys_Role>(it => it.IsDeleted == false);
+                    client.QueryFilter.AddTableFilter<Sys_RoleMenuMap>(it => it.IsDeleted == false);
+                    client.QueryFilter.AddTableFilter<Sys_User>(it => it.IsDeleted == false);
+                    client.QueryFilter.AddTableFilter<Sys_UserRoleMap>(it => it.IsDeleted == false);
                 }
 
                 return client;

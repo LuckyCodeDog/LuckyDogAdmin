@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
-using CMS.DTO;
 using CMS.Models.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using CMS.Common.DTO;
+using CMS.Common.DTO.user;
+using CMS.DTO;
+using CMS.Common.DTO.menu;
 namespace CMS.BusinessInterface.MapConfig
 {
     public class AutoMapperConfigs : Profile

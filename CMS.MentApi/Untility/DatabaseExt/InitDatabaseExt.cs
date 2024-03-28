@@ -1,4 +1,5 @@
-﻿using CMS.Models.Entity;
+﻿using CMS.Common.UserStateEnum;
+using CMS.Models.Entity;
 using SqlSugar;
 using SqlSugar.Extensions;
 using System;
@@ -51,7 +52,7 @@ namespace CMS.MentApi.Untility.DatabaseExt
                             Id = Guid.NewGuid(),
                             ParentId = default,
                             IsLeafNode = true,
-                            MenuText = menuOrButtonAttribute.GetMenuName(),
+                            MenuText = menuOrButtonAttribute?.GetMenuName(),
                             MenuType = (int)menuOrButtonAttribute.GetMenuType(),
                             VueFilePath = menuOrButtonAttribute.GetVueFilePath(),
                             Icon = "Home",
@@ -64,12 +65,12 @@ namespace CMS.MentApi.Untility.DatabaseExt
                             if (action.IsDefined(typeof(FunctionAttribute), true))
                             {
 
-                                FunctionAttribute btnAtrribute = action.GetCustomAttribute<FunctionAttribute>();
+                                FunctionAttribute? btnAtrribute = action.GetCustomAttribute<FunctionAttribute>();
                                 Sys_Button button = new Sys_Button
                                 {
                                     Id = Guid.NewGuid(),
                                     ParentId = menu.Id,
-                                    BtnText = btnAtrribute.GetMenuName(),
+                                    BtnText = btnAtrribute?.GetMenuName(),
                                     ControllerName = type.Name.ToLower().Replace("controller", ""),
                                     BtnValue = Guid.NewGuid().ToString(),
                                     ActionName = action.Name.ToLower(),
@@ -80,7 +81,74 @@ namespace CMS.MentApi.Untility.DatabaseExt
                             }
                         }
                     }
+
+                   
                 }
+
+                #region create super admin 
+                // insert  admin role in role table 
+                IConfigurationSection superAdminConfig = builder.Configuration.GetSection("SuperAdmin");
+                /*           "userId": "1",
+               "name": "SuperAdmin",
+               "email": "123@123.com",
+               "password": "123456"*/
+                try
+                {
+                    int superAdminId = int.Parse(superAdminConfig["UserId"]);
+                    string superAdminName = superAdminConfig["name"].ToString();
+                    string superAdminEmail = superAdminConfig["email"].ToString();
+                    string superAdminPassword = superAdminConfig["password"].ToString();
+                    Sys_Role adminRole = new Sys_Role() { RoleId = superAdminId, RoleName = superAdminName, CreateTime = DateTime.Now, Status = (int)ActiveStateEnum.Active };
+                    sqlSugarClient.Insertable<Sys_Role>(adminRole).ExecuteCommand();
+                    Sys_User adminUser = new Sys_User()
+                    {
+                        UserId = superAdminId,
+                        Name = superAdminName,
+                        Status = (int)ActiveStateEnum.Active,
+                        CreateTime = DateTime.Now,
+                        Password = superAdminPassword,
+                        Email = superAdminEmail,
+                        Phone = "5560550",
+                        Mobile = "5560550",
+                        Sex = 1,
+                        Address="Lincoln",
+                        ImageUrl= ""
+                    };
+                    sqlSugarClient.Insertable<Sys_User>(adminUser).ExecuteCommand();
+
+                    foreach (var menu in menuList)
+                    {
+                        sqlSugarClient.Insertable<Sys_RoleMenuMap>(new Sys_RoleMenuMap()
+                        {
+                            RoleId = adminRole.RoleId,
+                            MenuId = menu.Id,
+                        }).ExecuteCommand();
+                    }
+
+                    foreach (var btn in buttonList)
+                    {
+                        sqlSugarClient.Insertable<Sys_RoleBtnMap>(new Sys_RoleBtnMap()
+                        {
+                            RoleId = adminRole.RoleId,
+                            BtnId = btn.Id,
+                        }).ExecuteCommand();
+                    }
+
+                    sqlSugarClient.Insertable<Sys_UserRoleMap>(new Sys_UserRoleMap()
+                    {
+                        UserId = adminUser.UserId,
+                        RoleId = adminRole.RoleId,
+                    }).ExecuteCommand();
+                }
+                catch (Exception ex)
+                {
+                    throw new ApplicationException("Failed to parse SuperAdmin configuration.", ex);
+
+                }
+
+
+             
+                #endregion
                 //inset  menu and buttons info into data base
                 sqlSugarClient.Insertable(menuList).ExecuteCommand();
                 sqlSugarClient.Insertable(buttonList).ExecuteCommand();

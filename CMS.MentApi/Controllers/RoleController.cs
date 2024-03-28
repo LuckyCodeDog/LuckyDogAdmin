@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using CMS.BusinessInterface;
 using CMS.BusinessService;
+using CMS.Common.DTO;
+using CMS.Common.DTO.user;
 using CMS.Common.Enum;
 using CMS.Common.Result;
 using CMS.DTO;
@@ -8,6 +10,7 @@ using CMS.MentApi.Untility.DatabaseExt;
 using CMS.MentApi.Untility.Filters;
 using CMS.MentApi.Untility.SwaggerExt;
 using CMS.Models.Entity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
 using System.Linq.Expressions;
@@ -23,7 +26,7 @@ namespace CMS.MentApi.Controllers
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = false, GroupName = nameof(ApiVersions.v1))]
     [CustomExceptionFilter]
-    [Function(MenuType.Menu, "Role Management", "/role/list", "../views/Home/role/list/index.vue")]
+    [Function(MenuType.Menu, "Role Management", "/role")]
     public class RoleController : ControllerBase
     {
         /// <summary>
@@ -130,7 +133,7 @@ namespace CMS.MentApi.Controllers
 
 
         /// <summary>
-        /// 
+        /// page query users 
         /// </summary>
         /// <param name="userManageService"></param>
         /// <param name="mapper"></param>
@@ -180,6 +183,7 @@ namespace CMS.MentApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("{roleId:int}")]
+        [Function(MenuType.Button, "View Current Role Menus")]
         public async Task<JsonResult> GetRoleMenu([FromServices]IRoleServicce roleServicce, int roleId)
         {
 
@@ -199,6 +203,7 @@ namespace CMS.MentApi.Controllers
         /// <param name="menus"></param>
         /// <returns></returns>
         [HttpPost("{roleId:int}")]
+        [Function(MenuType.Button, "Set Role`s Menus")]
         public async Task<JsonResult> SetMenus([FromServices]IRoleServicce roleServicce, int roleId,  List<Sys_Menu_List_Dto> menus)
         {
 
@@ -220,6 +225,7 @@ namespace CMS.MentApi.Controllers
         /// <param name="userIds"></param>
         /// <returns></returns>
         [HttpPost("/api/Role/AssignUsers/{roleId:int}")]
+        [Function(MenuType.Button, "Assign Users")]
         public async Task<JsonResult> AssignUsers([FromServices]IRoleServicce roleServicce,  int roleId, List<int> userIds)
         {
             //validate role id 
@@ -230,6 +236,28 @@ namespace CMS.MentApi.Controllers
                 Message = resuult == true ? "Assign Users Successfully." : "Failed to Set Users."
             };
             return await Task.FromResult(new JsonResult(result));
+        }
+
+
+        /// <summary>
+        /// set role status
+        /// </summary>
+        /// <param name="roleServicce"></param>
+        /// <param name="rolId"></param>
+        /// <returns></returns>
+        [HttpPatch("/api/Role/SetStatus/{rolId:int}")]
+        [Function(MenuType.Button, "Set Role Status")]
+        public async Task<JsonResult> SetStatus([FromServices]IRoleServicce roleServicce,int rolId)
+           
+        {
+
+            bool result =  await   roleServicce.SetStatus(rolId);
+            ApiResult apiResult = new ApiResult()
+            {
+                Success = result,
+                Message = result ? "Set Status Successfully" : "Falied to Set Status"
+            };
+            return  await Task.FromResult(new JsonResult(apiResult));
         }
     }
 }

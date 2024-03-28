@@ -10,7 +10,6 @@ namespace CMS.Models.Entity
     {
         [SugarColumn(ColumnName = "UserId", IsIdentity = true, IsPrimaryKey = true)]
         public int UserId { get; set; }
-
         public string? Name { set; get; }
         public string? Password { set; get; }
 
@@ -18,7 +17,6 @@ namespace CMS.Models.Entity
         /// 用户状态  0正常 1冻结 2删除
         /// </summary>
         public int Status { set; get; }
-
         public string? Phone { set; get; }
 
         public string? Mobile { set; get; }
@@ -27,12 +25,7 @@ namespace CMS.Models.Entity
 
         public string? Email { set; get; }
 
-        public long QQ { set; get; }
-
-        public string? WeChat { set; get; }
-
         public int Sex { set; get; }
-
         public string? ImageUrl { set; get; }
         public DateTime? LastLoginTime { set; get; } = DateTime.Now;
     }

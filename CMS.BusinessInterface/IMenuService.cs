@@ -10,5 +10,7 @@ namespace CMS.BusinessInterface
     public interface IMenuService : IBusinessService
     {
         Task<PagingData<Sys_Menu>> PagingQueryMenu(int pageIndex, int pageSize);
+
+        Task<List<Sys_Menu>> GetUserMenus(int userId);
     }
 }

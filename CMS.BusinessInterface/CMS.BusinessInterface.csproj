@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CMS.DTO\CMS.DTO.csproj" />
+    <ProjectReference Include="..\CMS.Common\CMS.Common.csproj" />
     <ProjectReference Include="..\CMS.Models\CMS.Models.csproj" />
   </ItemGroup>
 

@@ -19,6 +19,15 @@ namespace CMS.BusinessService
             _mapper = mapper;
         }
 
+        public async Task<List<Sys_Menu>> GetUserMenus(int userId)
+        {
+          return await _client.Queryable<Sys_UserRoleMap, Sys_RoleMenuMap, Sys_Menu>((urm, rmm, m) => new object[]
+             {
+                 JoinType.Inner, urm.RoleId == rmm.RoleId,
+                 JoinType.Inner, rmm.MenuId == m.Id,
+             }).Where((urm, rmm, m) => urm.UserId == userId).Select((urm, rmm, m) => m).ToTreeAsync(m => m.Children, m => m.ParentId, default(Guid));
+        }
+
         public async Task<PagingData<Sys_Menu>> PagingQueryMenu(int pageIndex, int pageSize)
         {
             ISugarQueryable<Sys_Menu> menuList = _client

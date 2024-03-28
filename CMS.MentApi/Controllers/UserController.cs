@@ -13,6 +13,11 @@ using System.Linq.Expressions;
 using CMS.Common.UserStateEnum;
 using SqlSugar;
 using CMS.Common.Enum;
+using Microsoft.Extensions.Configuration.UserSecrets;
+using CMS.Common.DTO.user;
+using CMS.Common;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 namespace CMS.MentApi.Controllers
 {
     /// <summary>
@@ -22,7 +27,8 @@ namespace CMS.MentApi.Controllers
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = false, GroupName = nameof(ApiVersions.v1))]
     [CustomExceptionFilter]
-    [Function(MenuType.Menu, "User Management", "/user/info", "../views/Home/user/index.vue")]
+    [Function(MenuType.Menu, "User Management", "/user")]
+    [Authorize(Policy ="btn")]
     public class UserController : ControllerBase
     {
         private IUserService _userManageService;
@@ -38,7 +44,6 @@ namespace CMS.MentApi.Controllers
             _userManageService = userManageService;
             _mapper = mapper;
         }
-
 
 
 
@@ -59,6 +64,7 @@ namespace CMS.MentApi.Controllers
             //if search words is null or not 
             //create a expression  to if searchByname is null then is null or it is s=>s.name.contains(searchByName)
             Expression<Func<Sys_User, bool>> funcWhere;
+            
             if (string.IsNullOrEmpty(searchByName))
             {
                 funcWhere = s => s.IsDeleted == false;
@@ -77,6 +83,7 @@ namespace CMS.MentApi.Controllers
                 OValue = null
             }));
         }
+
 
         /// <summary>
         /// Add user
@@ -130,6 +137,7 @@ namespace CMS.MentApi.Controllers
             });
         }
 
+
         /// <summary>
         /// delete user set isdeletd  = true
         /// </summary>
@@ -158,6 +166,7 @@ namespace CMS.MentApi.Controllers
 
         }
 
+
         /// <summary>
         /// get user`s roles with selected
         /// </summary>
@@ -178,40 +187,24 @@ namespace CMS.MentApi.Controllers
             //get  role_ids  in user_role_map table by userId
             List<int> selectedRoleId = userRoleMapService.Query<Sys_UserRoleMap>(u => u.UserId == userId).Select(u => u.RoleId).ToList();
             //get selected role names  from role_table by roles is from above result 
-            List<String> selectedRoleNmaes = new List<string>();
-            if (selectedRoleId.Count > 0)
-            {
-                foreach (int roleId in selectedRoleId)
-                {
-                    Sys_Role selectedRole = await userRoleMenuServicce.FindAsync<Sys_Role>(roleId);
-                    selectedRoleNmaes.Add(selectedRole.RoleName);
-                }
-
-            }
             List<UserRoleInfoDto> finalResult = totalRoles.Select(r => new UserRoleInfoDto()
             {
                 role_id = r.RoleId,
                 role_name = r.RoleName,
-                selected = selectedRoleNmaes.Any(n => n == r.RoleName),
+                selected = selectedRoleId.Any(n => n == r.RoleId),
                 user_id = userId,
             }).ToList();
 
-            return new JsonResult(new ApiResult<List<UserRoleInfoDto>>
+            return   await Task.FromResult(new JsonResult(new ApiResult<List<UserRoleInfoDto>>
             {
                 Data = finalResult,
                 Message = "user  role info with selected roles",
                 Success = true
-            });
-
-
-
-            //form user role map dto result from above
-
-
+            }));
         }
 
       /// <summary>
-      /// 
+      /// set roles for current user 
       /// </summary>
       /// <param name="userRoleInfo"></param>
       /// <param name="userRoleMapService"></param>
@@ -252,6 +245,25 @@ namespace CMS.MentApi.Controllers
                 return new JsonResult(result);
             }
             return new JsonResult(result);
+        }
+
+        /// <summary>
+        /// View Menus with current user id
+        /// </summary>
+        /// <param name="userService"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpGet("/api/User/ViewMenus/{userId:int}")]
+        [Function(MenuType.Button, "View Menus")]
+        public async Task<JsonResult> ViewMenus([FromServices]IUserService userService,int userId)
+        {
+            List<TreeSelectDto> treeSelectDto =     await  userService.ViewMenus(userId);
+            return await Task.FromResult(new JsonResult(new ApiResult<List<TreeSelectDto>>()
+            {
+                Success = true,
+                Data = treeSelectDto,
+                Message = "selected menu tree."
+            }));
         }
     }
 }
