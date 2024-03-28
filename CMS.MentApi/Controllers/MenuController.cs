@@ -22,8 +22,7 @@ namespace CMS.MentApi.Controllers
     [ApiController]
     [ApiExplorerSettings(GroupName = nameof(ApiVersions.v1), IgnoreApi = false)]
     [CustomExceptionFilter]
-    [Function(MenuType.Menu, "Menu Management", "/menu")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Function(MenuType.Menu, "Menu Management", "/menu", "../views/Home/menu/index.vue")]
     public class MenuController : ControllerBase
     {
         private readonly IMapper _mapper;
