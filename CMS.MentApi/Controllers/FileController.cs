@@ -3,6 +3,7 @@ using CMS.Common.Result;
 using CMS.MentApi.Untility.DatabaseExt;
 using CMS.MentApi.Untility.Filters;
 using CMS.MentApi.Untility.SwaggerExt;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using System.Net;
@@ -16,6 +17,7 @@ namespace CMS.MentApi.Controllers
     [ApiExplorerSettings(GroupName = nameof(ApiVersions.v1), IgnoreApi = false)]
     [CustomExceptionFilter]
     [Function(MenuType.Menu, "File Management")]
+    [Authorize(Policy = "btn")]
     public class FileController : ControllerBase
     {
 

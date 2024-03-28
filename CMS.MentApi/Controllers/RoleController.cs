@@ -27,6 +27,7 @@ namespace CMS.MentApi.Controllers
     [ApiExplorerSettings(IgnoreApi = false, GroupName = nameof(ApiVersions.v1))]
     [CustomExceptionFilter]
     [Function(MenuType.Menu, "Role Management", "/role")]
+    [Authorize(Policy = "btn")]
     public class RoleController : ControllerBase
     {
         /// <summary>

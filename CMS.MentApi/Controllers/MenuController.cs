@@ -23,6 +23,7 @@ namespace CMS.MentApi.Controllers
     [ApiExplorerSettings(GroupName = nameof(ApiVersions.v1), IgnoreApi = false)]
     [CustomExceptionFilter]
     [Function(MenuType.Menu, "Menu Management", "/menu", "../views/Home/menu/index.vue")]
+    [Authorize(Policy = "btn")]
     public class MenuController : ControllerBase
     {
         private readonly IMapper _mapper;
