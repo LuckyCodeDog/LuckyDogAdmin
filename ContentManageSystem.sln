@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMS.BusinessService", "CMS.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMS.Common", "CMS.Common\CMS.Common.csproj", "{D8EAA3ED-5F45-4536-AFEA-B870037C60E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMS.IdentityApi", "CMS.IdentityApi\CMS.IdentityApi.csproj", "{F368A230-9CF6-41F5-8FDB-16183DD9D294}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMS.IdentityApi", "CMS.IdentityApi\CMS.IdentityApi.csproj", "{F368A230-9CF6-41F5-8FDB-16183DD9D294}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

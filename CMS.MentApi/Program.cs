@@ -56,12 +56,15 @@ namespace CMS.MentApi
             //cros
             app.UserCrosDomainsPolicy();
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
+            /*     if (app.Environment.IsDevelopment())
+                 {
+                     app.UseSwagger();
 
-                app.UseSwaggerExt();
-            }
+                     app.UseSwaggerExt();
+                 }*/
+            app.UseSwagger();
+
+            app.UseSwaggerExt();
             app.UseHttpsRedirection();
          
             app.UseAuthentication();

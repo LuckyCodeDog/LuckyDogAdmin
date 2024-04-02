@@ -30,19 +30,28 @@ namespace CMS.Common.JwtService
             //preapre payload 
             List<Claim> claims = base.CliamsToUser(user);
             // preapare secret key 
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jWTTokenOptions.SecurityKey));
+            try
+            {
+                SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jWTTokenOptions.SecurityKey));
+                SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                JwtSecurityToken jwtAccessToken = new JwtSecurityToken(
+                    issuer: _jWTTokenOptions.Issuer,
+                    audience: _jWTTokenOptions.Audience,
+                    claims: claims.ToArray(),
+                    expires: DateTime.Now.AddMinutes(120),
+                    signingCredentials: credentials
+                 );
+
+                return token = new JwtSecurityTokenHandler().WriteToken(jwtAccessToken);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Please Config Jwt SecurityKey " ,ex);
+            }
+       
             //sha256
-            SigningCredentials credentials =  new SigningCredentials(key,SecurityAlgorithms.HmacSha256);
-
-            JwtSecurityToken jwtAccessToken = new JwtSecurityToken(
-                issuer: _jWTTokenOptions.Issuer,
-                audience: _jWTTokenOptions.Audience,
-                claims: claims.ToArray(),
-                expires: DateTime.Now.AddMinutes(10),
-                signingCredentials: credentials
-             );
-
-            return  token =  new JwtSecurityTokenHandler().WriteToken(jwtAccessToken);
+         
         }
     }
 }

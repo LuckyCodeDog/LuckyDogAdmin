@@ -131,17 +131,17 @@ namespace CMS.BusinessService
 
 
 
-        public Task<bool> ValidateBtnAsync(int userId, string btnValue)
+        public async Task<bool> ValidateBtnAsync(int userId, string btnValue)
         {
-            // get user`s button value  using join
-         bool iscontain =     _client.Queryable<Sys_UserRoleMap, Sys_RoleBtnMap, Sys_Button>((urm, r, b) =>
+          // get user`s button value  using join
+         bool iscontain =  await   _client.Queryable<Sys_UserRoleMap, Sys_RoleBtnMap, Sys_Button>((urm, r, b) =>
             new object[]
             {
                  JoinType.Inner, urm.RoleId ==r.RoleId ,
                  JoinType.Inner, r.BtnId == b.Id,
-            }).Where((urm, r, b) =>  urm.UserId.Equals(userId) ).Any((urm,r,b)=>b.FullName==btnValue );
+            }).Where((urm, r, b) =>  urm.UserId.Equals(userId)&&b.FullName==btnValue ).AnyAsync();
 
-            return Task.FromResult(iscontain);
+            return iscontain;
         }
 
     }

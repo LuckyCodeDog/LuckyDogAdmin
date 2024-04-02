@@ -59,6 +59,7 @@ namespace CMS.MentApi.Untility.AuthorizeExt
                         context.Fail();
                     }
                 }
+                
             }
             await Task.CompletedTask;
         }

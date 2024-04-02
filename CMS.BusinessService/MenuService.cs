@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using CMS.BusinessInterface;
+using CMS.Common.DTO.menu;
+using CMS.Common.Enum;
 using CMS.Models.Entity;
 using SqlSugar;
 using System;
@@ -19,13 +21,26 @@ namespace CMS.BusinessService
             _mapper = mapper;
         }
 
+        public async Task<bool> DeleteMenu(Guid menuId)
+        {
+            //validate  if it is null find in menu_btn_map  if i has buttons  return  false 
+            Sys_Menu menu = await _client.Queryable<Sys_Menu>().Where(m => m.Id == menuId).FirstAsync();
+            if (menu == null) throw new Exception("Menu Does not Exsist.");
+            List<Guid> menuIdsOfBtn = await _client.Queryable<Sys_Button>().Where(b => true).Select(b => b.ParentId).ToListAsync();
+            if (menuIdsOfBtn.Any(id => id == menuId) == true)
+            {
+                throw new Exception("This Menu Contains Buttons Can not Delete.");
+            }
+            return await _client.Deleteable<Sys_Menu>(menu).ExecuteCommandHasChangeAsync();
+        }
+
         public async Task<List<Sys_Menu>> GetUserMenus(int userId)
         {
-          return await _client.Queryable<Sys_UserRoleMap, Sys_RoleMenuMap, Sys_Menu>((urm, rmm, m) => new object[]
-             {
+            return await _client.Queryable<Sys_UserRoleMap, Sys_RoleMenuMap, Sys_Menu>((urm, rmm, m) => new object[]
+               {
                  JoinType.Inner, urm.RoleId == rmm.RoleId,
                  JoinType.Inner, rmm.MenuId == m.Id,
-             }).Where((urm, rmm, m) => urm.UserId == userId).Select((urm, rmm, m) => m).ToTreeAsync(m => m.Children, m => m.ParentId, default(Guid));
+               }).Where((urm, rmm, m) => urm.UserId == userId).Select((urm, rmm, m) => m).ToTreeAsync(m => m.Children, m => m.ParentId, default(Guid));
         }
 
         public async Task<PagingData<Sys_Menu>> PagingQueryMenu(int pageIndex, int pageSize)
@@ -50,7 +65,7 @@ namespace CMS.BusinessService
                      IsEnabled = m1.IsEnabled
                  });
 
-            ISugarQueryable<Sys_Menu> btnList = _client.Queryable<Sys_Button>().Select(b=> new Sys_Menu()
+            ISugarQueryable<Sys_Menu> btnList = _client.Queryable<Sys_Button>().Select(b => new Sys_Menu()
             {
                 Id = b.Id,
                 ParentId = b.ParentId,
@@ -67,22 +82,164 @@ namespace CMS.BusinessService
                 IsDeleted = b.IsDeleted,
                 IsEnabled = b.IsEnabled
 
-            }); 
+            });
 
             // form a treee 
 
-          var  treeData = _client.UnionAll(menuList,btnList);
-          List<Sys_Menu> treeDataList =   await  treeData.ToTreeAsync(t => t.Children, t => t.ParentId, default(Guid));
+            var treeData = _client.UnionAll(menuList, btnList);
+            List<Sys_Menu> treeDataList = await treeData.ToTreeAsync(t => t.Children, t => t.ParentId, default(Guid));
 
-          return await Task.FromResult(new PagingData<Sys_Menu>()
-          {
-              DataList = treeDataList.Skip((pageIndex-1)*pageSize).Take(pageSize) .ToList(),
-              PageIndex = pageIndex,
-              PageSize = pageSize   
-          });
+            return await Task.FromResult(new PagingData<Sys_Menu>()
+            {
+                DataList = treeDataList.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList(),
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            });
 
         }
 
+        public async Task<bool> SetRoles(List<int> roleIds, string menuId, int menuType)
+        {
+
+            // validate all role ids in database 
+            List<Sys_Role> roleList = new List<Sys_Role>(); 
+
+            foreach(int roleId in roleIds)
+            {
+                Sys_Role  role  =    await _client.Queryable<Sys_Role>().Where(r => r.RoleId == roleId).FirstAsync();
+               if(role == null)
+                {
+                    throw new Exception("Role Ids contain Invalid ones.");
+                }
+            }
+
+            
+
+            if (menuType == (int) MenuType.Button)
+            {
+                //validate menuid 
+               Sys_Button btn = await   _client.Queryable<Sys_Button>().Where(b => b.Id == Guid.Parse(menuId)).FirstAsync();
+                if (btn == null) throw new Exception("Menu id is invalid.");
+
+                // tranc in role btn map 
+                try
+                {
+                    //delte  all in role_btn_map with menuId 
+                    //insert  role id - menu id  in role_btn_map 
+                    _client.Ado.BeginTran();
+                     await  _client.Deleteable<Sys_RoleBtnMap>().Where(b=>b.BtnId == Guid.Parse(menuId)).ExecuteCommandAsync();
+                     foreach(int roleId in roleIds)
+                    {
+                        await _client.Insertable<Sys_RoleBtnMap>(new Sys_RoleBtnMap()
+                        {
+                            RoleId = roleId,
+                            BtnId = btn.Id,
+                        }).ExecuteCommandAsync();
+                    }
+                    //commit tranc 
+                    _client.Ado.CommitTran();
+                    return true;
+
+                }catch (Exception ex)
+                {
+                    //catch error and roll back 
+                    _client.Ado.RollbackTran();
+                    throw new Exception("Failed to Set Roles", ex);
+                }
+               
+              
       
+            }
+            if (menuType == (int)MenuType.Menu)
+            {
+                //validate menuid 
+                Sys_Menu  menu = await _client.Queryable<Sys_Menu>().Where(b => b.Id == Guid.Parse(menuId)).FirstAsync();
+                if (menu == null) throw new Exception("Menu id is invalid.");
+                // tranc in role btn map 
+                try
+                {
+                    //delte  all in role_btn_map with menuId 
+                    //insert  role id - menu id  in role_btn_map 
+                    _client.Ado.BeginTran();
+                    await _client.Deleteable<Sys_RoleMenuMap>().Where(b => b.MenuId == Guid.Parse(menuId)).ExecuteCommandAsync();
+                    foreach (int roleId in roleIds)
+                    {
+                        await _client.Insertable<Sys_RoleMenuMap>(new Sys_RoleMenuMap()
+                        {
+                            RoleId = roleId,
+                            MenuId = menu.Id,   
+                        }).ExecuteCommandAsync();
+                    }
+                    //commit tranc 
+                    _client.Ado.CommitTran();
+                    return true;
+
+                }
+                catch (Exception ex)
+                {
+                    //catch error and roll back 
+                    _client.Ado.RollbackTran();
+                    throw new Exception("Failed to Set Roles", ex);
+                }
+
+            }
+           return false;
+        }
+
+        public async Task<List<MenuRoleInfoDto>> ViewMenuRoles(Guid menuId, int menuType)
+            
+        {
+            Sys_Menu menu = new Sys_Menu();
+            Sys_Button button = new Sys_Button();
+            List<int> roleIds = new List<int>();
+            List<Sys_Role> roles = await _client.Queryable<Sys_Role>().Where(r => true).ToListAsync();
+            List<MenuRoleInfoDto> selectedRoles = new List<MenuRoleInfoDto>();
+            if (menuType == (int)MenuType.Menu)
+            {
+                //validate if menu exsist 
+                menu = this.Query<Sys_Menu>(m => m.Id == menuId).First();
+
+                if (menu == null) throw new Exception("Menu Id is invalid.");
+                // get role ids in menu_role_map 
+                  roleIds = await _client.Queryable<Sys_RoleMenuMap>()
+                    .Where(m => m.MenuId == menuId)
+                    .Select(m => m.RoleId).ToListAsync();
+                //get all  roles in roles table 
+
+                // to the  menurole info dto 
+               selectedRoles = roles.Select(r => new MenuRoleInfoDto()
+                {
+                    menuId = menuId,
+                    roleId = r.RoleId,
+                    menuText = menu.MenuText,
+                    roleName = r.RoleName,
+                    selected = roleIds.Contains(r.RoleId)
+                }).ToList();
+
+                return selectedRoles;
+            }
+            else if(menuType == (int)MenuType.Button)
+            {
+                button  = this.Query<Sys_Button>(b=>b.Id== menuId).First();
+                if (button == null) throw new Exception("Menu Id is invalid.");
+                roleIds = await _client.Queryable<Sys_RoleBtnMap>()
+                  .Where(m => m.BtnId == menuId)
+                  .Select(m => m.RoleId).ToListAsync();
+                 selectedRoles = roles.Select(r => new MenuRoleInfoDto()
+                {
+                    menuId = menuId,
+                    roleId = r.RoleId,
+                    menuText = menu.MenuText,
+                    roleName = r.RoleName,
+                    selected = roleIds.Contains(r.RoleId)
+                }).ToList();
+
+                return selectedRoles;
+            }
+            else
+            {
+                throw new Exception("Invalid MenuType");
+            }
+        }
     }
 }

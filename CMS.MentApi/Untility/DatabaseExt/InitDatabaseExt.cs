@@ -54,8 +54,7 @@ namespace CMS.MentApi.Untility.DatabaseExt
                             IsLeafNode = true,
                             MenuText = menuOrButtonAttribute?.GetMenuName(),
                             MenuType = (int)menuOrButtonAttribute.GetMenuType(),
-                            VueFilePath = menuOrButtonAttribute.GetVueFilePath(),
-                            Icon = "Home",
+                            Icon = menuOrButtonAttribute.GetIcon(),
                             WebUrl = menuOrButtonAttribute.GetWebUrlName(),
                             ControllerName =   type.Name.ToLower().Replace("controller", ""),
                         };
@@ -74,7 +73,7 @@ namespace CMS.MentApi.Untility.DatabaseExt
                                     ControllerName = type.Name.ToLower().Replace("controller", ""),
                                     BtnValue = Guid.NewGuid().ToString(),
                                     ActionName = action.Name.ToLower(),
-                                    Icon = "Home",
+                                    Icon = menuOrButtonAttribute.GetIcon() ,
                                     FullName = $"{type.Name}_{action.Name}",
                                 };
                                 buttonList.Add(button);

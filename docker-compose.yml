@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  cms.mentapi:
+    image: ${DOCKER_REGISTRY-}cmsmentapi
+    build:
+      context: .
+      dockerfile: CMS.MentApi/Dockerfile

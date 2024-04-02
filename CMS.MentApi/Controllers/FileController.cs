@@ -27,7 +27,7 @@ namespace CMS.MentApi.Controllers
         /// <param name="file"></param>
         /// <returns></returns>
         [HttpPost]
-        [Function(MenuType.Button, "Upload User Avantar")]
+        [AllowAnonymous]
         public async Task<JsonResult> UploadAvantar([FromForm] IFormFile file)
         {
             if (file == null) throw new ArgumentNullException(nameof(file));
@@ -65,7 +65,7 @@ namespace CMS.MentApi.Controllers
         /// <param name="filePath"></param>
         /// <returns></returns>
         [HttpGet("{filePath}")]
-        [Function(MenuType.Button, "download user avantar")]
+        [AllowAnonymous]
         public IActionResult Download(string filePath)
         {
             if (string.IsNullOrEmpty(filePath)) throw new Exception("Invalid file path.");

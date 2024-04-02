@@ -26,7 +26,7 @@ namespace CMS.MentApi.Controllers
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = false, GroupName = nameof(ApiVersions.v1))]
     [CustomExceptionFilter]
-    [Function(MenuType.Menu, "Role Management", "/role")]
+    [Function(MenuType.Menu, "Role Management", "/role" , "UsergroupAddOutlined")]
     [Authorize(Policy = "btn")]
     public class RoleController : ControllerBase
     {

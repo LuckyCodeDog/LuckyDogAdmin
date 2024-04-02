@@ -14,20 +14,20 @@ namespace CMS.MentApi.Untility.DatabaseExt
 
         private string? _webUrlName {  get; set; }
 
-        private string? _vueFilePath { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="menuType"></param>
-        /// <param name="menuName"></param>
-        /// <param name="webUrlName"></param>
-        /// <param name="vueFilePath"></param>
-        public FunctionAttribute(MenuType menuType, string? menuName = null, string? webUrlName=null, string?  vueFilePath=null)
+        private string? _icon { get; set; }
+/// <summary>
+/// 
+/// </summary>
+/// <param name="menuType"></param>
+/// <param name="menuName"></param>
+/// <param name="webUrlName"></param>
+/// <param name="icon"></param>
+        public FunctionAttribute(MenuType menuType, string? menuName = null, string? webUrlName=null, string?  icon= "MenuOutlined")
         {
             _menuType = menuType;
             _menuName = menuName;
             _webUrlName = webUrlName;
-            _vueFilePath = vueFilePath;
+            _icon = icon;
         }
         /// <summary>
         /// 
@@ -57,7 +57,7 @@ namespace CMS.MentApi.Untility.DatabaseExt
         /// vue project`s file path 
         /// </summary>
         /// <returns></returns>
-        public string? GetVueFilePath() => _vueFilePath;
+        public string? GetIcon () => _icon;
     }
 
  

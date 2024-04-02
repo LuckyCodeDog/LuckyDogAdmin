@@ -27,7 +27,7 @@ namespace CMS.MentApi.Controllers
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = false, GroupName = nameof(ApiVersions.v1))]
     [CustomExceptionFilter]
-    [Function(MenuType.Menu, "User Management", "/user")]
+    [Function(MenuType.Menu, "User Management", "/user", "UserOutlined")]
     [Authorize(Policy ="btn")]
     public class UserController : ControllerBase
     {
