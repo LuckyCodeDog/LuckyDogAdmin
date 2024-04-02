@@ -19,7 +19,7 @@
 
 #### ✨Project Structure
 
-![ad7ed970f1abbc891215623ea2e3dc3](https://raw.githubusercontent.com/LuckyCodeDog/LuckyDogAdmin/master/551fa17345465fcb8c022d456140cc2.png?token=GHSAT0AAAAAACOJJCCFFOHRUQ3VUBEZVTF2ZQLRJPA)
+![ad7ed970f1abbc891215623ea2e3dc3](https://raw.githubusercontent.com/LuckyCodeDog/LuckyDog.Admin_Web/main/DemoPics/ad7ed970f1abbc891215623ea2e3dc3.png?token=GHSAT0AAAAAACOJJCCEUXKWOHTV5CFUTEE4ZQLRRKA)
 
 #### 👀Function Details
 
