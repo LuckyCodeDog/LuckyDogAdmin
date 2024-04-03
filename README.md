@@ -9,7 +9,7 @@
 #### 🎉Tech Stack 
 
 - ​	Backend: .NET CORE WEB API  8.0 + SqlSugar+ JWT + AutoMapper
-- ​	Frontend: React(Ant Design)
+- ​	Frontend: React(Ant Design) [View on GitHub](https://github.com/LuckyCodeDog/LuckyDog.Admin_Web)
 - ​	Deploy: Azure Cloud +Linux + Docker
 
 #### 👍DB Initialization
