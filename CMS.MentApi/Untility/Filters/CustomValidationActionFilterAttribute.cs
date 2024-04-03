@@ -44,7 +44,7 @@ namespace CMS.MentApi.Untility.Filters
                     if (prop.IsDefined(typeof(BaseValidateAtrribute), true))
                     {
                         var oValue = prop.GetValue(param);
-                        BaseValidateAtrribute customValidation = prop.GetCustomAttribute<BaseValidateAtrribute>();
+                        BaseValidateAtrribute? customValidation = prop?.GetCustomAttribute<BaseValidateAtrribute>();
                         result.Add(customValidation.DoValidate(oValue));
                     }
                 }

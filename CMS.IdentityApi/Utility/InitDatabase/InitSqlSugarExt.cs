@@ -58,10 +58,13 @@ namespace CMS.MentApi.Untility.DatabaseExt
                 };
 
                 {
+                    //only contains
                     client.QueryFilter.AddTableFilter<Sys_Menu>(it => it.IsDeleted == false);
                     client.QueryFilter.AddTableFilter<Sys_Role>(it => it.IsDeleted == false);
+
                     client.QueryFilter.AddTableFilter<Sys_RoleMenuMap>(it => it.IsDeleted == false);
                     client.QueryFilter.AddTableFilter<Sys_User>(it => it.IsDeleted == false);
+                    client.QueryFilter.AddTableFilter<Sys_User>(it => it.Status == (int)ActiveStateEnum.Active);
                     client.QueryFilter.AddTableFilter<Sys_UserRoleMap>(it => it.IsDeleted == false);
                 }
 
