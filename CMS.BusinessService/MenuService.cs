@@ -21,17 +21,71 @@ namespace CMS.BusinessService
             _mapper = mapper;
         }
 
+        public async Task<bool> AddMenu(MenuToAddDto menuToAddDto)
+        {
+            //tell if it is leaf , need to be without submenus 
+            Sys_Menu menuToInsert = new Sys_Menu();
+            if (menuToAddDto.ParentId == Guid.Empty)
+            {
+                    //add a  new menu direactly  
+                    menuToInsert.ParentId = Guid.Empty;
+                    menuToInsert.Id =  Guid.NewGuid();
+                    menuToInsert.MenuText = menuToAddDto.MenuText;
+                    menuToInsert.IsLeafNode = true;
+                    menuToInsert.Icon = menuToAddDto.Icon;  
+                    menuToInsert.MenuType = (int)MenuType.Menu;
+                    menuToInsert.CreateTime = DateTime.Now;
+                    return   await _client.Insertable<Sys_Menu>(menuToInsert).ExecuteCommandIdentityIntoEntityAsync();
+            }
+
+            // validate if parent menu exsist in database 
+            Sys_Menu menuInDb = await _client.Queryable<Sys_Menu>().Where(m => m.Id == menuToAddDto.ParentId).FirstAsync();
+            if (menuInDb == null)
+            {
+                throw new Exception("Parent Menus Does not Exsist!");
+            }
+            menuToInsert.ParentId = menuToAddDto.ParentId;
+            menuToInsert.Id = Guid.NewGuid();
+            menuToInsert.MenuText = menuToAddDto.MenuText;
+            menuToInsert.IsLeafNode = true;
+            menuToInsert.Icon = menuToAddDto.Icon;
+            menuToInsert.MenuType = (int)MenuType.Menu;
+            menuToInsert.CreateTime = DateTime.Now;
+            // tracn begiin 
+            try
+            {
+                _client.Ado.BeginTran();
+                menuInDb.IsLeafNode = false;
+                await _client.Updateable<Sys_Menu>(menuInDb).ExecuteCommandAsync();
+                await _client.Insertable<Sys_Menu>(menuToInsert).ExecuteCommandAsync();
+                _client.Ado.CommitTran();
+                return true;
+            }catch (Exception ex)
+            {
+               await  _client.Ado.RollbackTranAsync();
+               throw  new Exception("Failed To Add Menu.",ex);
+            }
+       
+        }
+
         public async Task<bool> DeleteMenu(Guid menuId)
         {
             //validate  if it is null find in menu_btn_map  if i has buttons  return  false 
+            // tell if it is leafnode
             Sys_Menu menu = await _client.Queryable<Sys_Menu>().Where(m => m.Id == menuId).FirstAsync();
             if (menu == null) throw new Exception("Menu Does not Exsist.");
             List<Guid> menuIdsOfBtn = await _client.Queryable<Sys_Button>().Where(b => true).Select(b => b.ParentId).ToListAsync();
+            //need to st parent leaf node ture if IT donesn1t have any sub menus
             if (menuIdsOfBtn.Any(id => id == menuId) == true)
             {
                 throw new Exception("This Menu Contains Buttons Can not Delete.");
             }
             return await _client.Deleteable<Sys_Menu>(menu).ExecuteCommandHasChangeAsync();
+        }
+
+        public async  Task<List<Sys_Menu>> GetAllMenus()
+        {
+            return  await _client.Queryable<Sys_Menu>().Where(m=>true).ToListAsync();
         }
 
         public async Task<List<Sys_Menu>> GetUserMenus(int userId)
@@ -102,16 +156,20 @@ namespace CMS.BusinessService
         {
 
             // validate all role ids in database 
-            List<Sys_Role> roleList = new List<Sys_Role>(); 
-
-            foreach(int roleId in roleIds)
+            List<Sys_Role> roleList = new List<Sys_Role>();
+            if (roleList.Count > 0)
             {
-                Sys_Role  role  =    await _client.Queryable<Sys_Role>().Where(r => r.RoleId == roleId).FirstAsync();
-               if(role == null)
+                foreach (int roleId in roleIds)
                 {
-                    throw new Exception("Role Ids contain Invalid ones.");
+                    Sys_Role role = await _client.Queryable<Sys_Role>().Where(r => r.RoleId == roleId).FirstAsync();
+                    if (role == null)
+                    {
+                        throw new Exception("Role Ids contain Invalid ones.");
+                    }
                 }
+
             }
+         
 
             
 
@@ -128,13 +186,16 @@ namespace CMS.BusinessService
                     //insert  role id - menu id  in role_btn_map 
                     _client.Ado.BeginTran();
                      await  _client.Deleteable<Sys_RoleBtnMap>().Where(b=>b.BtnId == Guid.Parse(menuId)).ExecuteCommandAsync();
-                     foreach(int roleId in roleIds)
+                    if(roleIds.Count > 0)
                     {
-                        await _client.Insertable<Sys_RoleBtnMap>(new Sys_RoleBtnMap()
+                        foreach (int roleId in roleIds)
                         {
-                            RoleId = roleId,
-                            BtnId = btn.Id,
-                        }).ExecuteCommandAsync();
+                            await _client.Insertable<Sys_RoleBtnMap>(new Sys_RoleBtnMap()
+                            {
+                                RoleId = roleId,
+                                BtnId = btn.Id,
+                            }).ExecuteCommandAsync();
+                        }
                     }
                     //commit tranc 
                     _client.Ado.CommitTran();
@@ -162,13 +223,16 @@ namespace CMS.BusinessService
                     //insert  role id - menu id  in role_btn_map 
                     _client.Ado.BeginTran();
                     await _client.Deleteable<Sys_RoleMenuMap>().Where(b => b.MenuId == Guid.Parse(menuId)).ExecuteCommandAsync();
-                    foreach (int roleId in roleIds)
+                    if(roleIds.Count>0)
                     {
-                        await _client.Insertable<Sys_RoleMenuMap>(new Sys_RoleMenuMap()
+                        foreach (int roleId in roleIds)
                         {
-                            RoleId = roleId,
-                            MenuId = menu.Id,   
-                        }).ExecuteCommandAsync();
+                            await _client.Insertable<Sys_RoleMenuMap>(new Sys_RoleMenuMap()
+                            {
+                                RoleId = roleId,
+                                MenuId = menu.Id,
+                            }).ExecuteCommandAsync();
+                        }
                     }
                     //commit tranc 
                     _client.Ado.CommitTran();

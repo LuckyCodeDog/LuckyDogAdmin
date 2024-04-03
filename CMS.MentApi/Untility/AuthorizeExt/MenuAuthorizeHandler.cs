@@ -41,7 +41,7 @@ namespace CMS.MentApi.Untility.AuthorizeExt
                 object? controllerName =   httpContext.GetRouteValue("controller");
                 object? actionName = httpContext.GetRouteValue("action");
 
-                 string?  strUserId  =  context.User?.Claims?.FirstOrDefault(c => c.Type.Equals(ClaimTypes.Sid))?.Value;
+                string?  strUserId  =  context.User?.Claims?.FirstOrDefault(c => c.Type.Equals(ClaimTypes.Sid))?.Value;
                 if(strUserId ==null)
                 {
                     context?.Fail();
@@ -59,7 +59,6 @@ namespace CMS.MentApi.Untility.AuthorizeExt
                         context.Fail();
                     }
                 }
-                
             }
             await Task.CompletedTask;
         }

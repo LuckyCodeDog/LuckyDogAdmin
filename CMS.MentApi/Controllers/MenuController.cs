@@ -3,6 +3,7 @@ using CMS.BusinessInterface;
 using CMS.Common.DTO.menu;
 using CMS.Common.Enum;
 using CMS.Common.Result;
+using CMS.DTO;
 using CMS.MentApi.Untility.DatabaseExt;
 using CMS.MentApi.Untility.Filters;
 using CMS.MentApi.Untility.SwaggerExt;
@@ -101,6 +102,7 @@ namespace CMS.MentApi.Controllers
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         [HttpDelete]
+        [Route("{menuid}")]
         [AllowAnonymous]
         public async Task<JsonResult> DelteMenu([FromServices] IMenuService menuService, string menuId)
 
@@ -124,7 +126,7 @@ namespace CMS.MentApi.Controllers
         }
 
         /// <summary>
-        /// 
+        /// View Roles
         /// </summary>
         /// <param name="menuService"></param>
         /// <param name="menuId"></param>
@@ -148,7 +150,7 @@ namespace CMS.MentApi.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Set Roles
         /// </summary>
         /// <param name="menuService"></param>
         /// <param name="rolesToSet"></param>
@@ -158,7 +160,7 @@ namespace CMS.MentApi.Controllers
         [AllowAnonymous]
         public async Task<JsonResult> SetRoles([FromServices] IMenuService menuService, RolesToSetDto rolesToSet)
         {
-            if(rolesToSet == null || rolesToSet.roleId ==null || rolesToSet.roleId.Count<=0||rolesToSet.menuId == null||rolesToSet.roleId.Contains(0))
+            if(rolesToSet == null || rolesToSet.roleId ==null ||rolesToSet.menuId == null||rolesToSet.roleId.Contains(0))
             {
                 throw new Exception("Contians Invalid Params.");
             }
@@ -167,6 +169,48 @@ namespace CMS.MentApi.Controllers
             return new JsonResult(new ApiResult()
             {
                 Message = result == true ? "Set Roles Successful." : "Failed To Set Roles.",
+                Success = result
+            });
+        }
+
+        /// <summary>
+        /// Get All Menus Info
+        /// </summary>
+        /// <param name="menuService"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("/api/Menu/All")]
+        public async Task<JsonResult> GetAllMenus([FromServices]IMenuService menuService)
+        {
+                List<Sys_Menu>  menus =    await  menuService.GetAllMenus();
+
+            //add Dto later
+            return new JsonResult(new ApiResult<List<Sys_Menu>>()
+            {
+                Data = menus,
+                Success = true,
+                Message = "All Menus Info"
+            });
+                
+
+        }
+
+
+        /// <summary>
+        /// Add Menu
+        /// </summary>
+        /// <param name="menuService"></param>
+        /// <param name="menuToAddDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<JsonResult> AddMenu([FromServices]IMenuService menuService,MenuToAddDto  menuToAddDto)
+        {
+            bool   result  =  await menuService.AddMenu(menuToAddDto);
+            return new JsonResult(new ApiResult()
+            {
+                Message = result == true ? "Add Menu Successful." : "Failed To Add Menu.",
                 Success = result
             });
         }

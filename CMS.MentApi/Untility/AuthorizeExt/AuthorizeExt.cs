@@ -83,8 +83,6 @@ namespace CMS.MentApi.Untility.AuthorizeExt
                 };
             });
 
-
-
             builder.Services.AddTransient<IAuthorizationHandler, MenuAuthorizeHandler>();
             builder.Services.AddAuthorization(options =>
             {

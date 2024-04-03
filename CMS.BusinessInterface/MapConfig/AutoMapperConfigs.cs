@@ -28,6 +28,7 @@ namespace CMS.BusinessInterface.MapConfig
 
             CreateMap<Sys_Menu,SysMenuDTO>().ReverseMap();  
 
+
         }
     }
 }

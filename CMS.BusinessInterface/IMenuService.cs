@@ -19,5 +19,9 @@ namespace CMS.BusinessInterface
         Task<List<MenuRoleInfoDto>> ViewMenuRoles(Guid menuId, int menuType);
 
         Task<bool> SetRoles(List<int> roleIds, string menuId, int menuType);
+
+        Task<List<Sys_Menu>> GetAllMenus();
+
+        Task<bool> AddMenu(MenuToAddDto menuToAdd);
     }
 }
