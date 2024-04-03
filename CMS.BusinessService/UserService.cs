@@ -134,12 +134,14 @@ namespace CMS.BusinessService
         public async Task<bool> ValidateBtnAsync(int userId, string btnValue)
         {
           // get user`s button value  using join
-         bool iscontain =  await   _client.Queryable<Sys_UserRoleMap, Sys_RoleBtnMap, Sys_Button>((urm, r, b) =>
+         bool iscontain =  await   _client.Queryable<Sys_User,  Sys_UserRoleMap,Sys_Role, Sys_RoleBtnMap, Sys_Button>((u,urm, r,rbm, b) =>
             new object[]
             {
+                JoinType.Inner, u.UserId ==urm.UserId,
                  JoinType.Inner, urm.RoleId ==r.RoleId ,
-                 JoinType.Inner, r.BtnId == b.Id,
-            }).Where((urm, r, b) =>  urm.UserId.Equals(userId)&&b.FullName==btnValue ).AnyAsync();
+                 JoinType.Inner, r.RoleId == rbm.RoleId,
+                 JoinType.Inner, rbm.BtnId == b.Id ,
+            }).Where((u, urm, r, rbm, b) => u.Status==(int)ActiveStateEnum.Active&&r.Status==(int)ActiveStateEnum.Active&&u.UserId==userId&&b.FullName ==btnValue   ).AnyAsync();
 
             return iscontain;
         }

@@ -18,6 +18,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using CMS.MentApi.Untility.AuthorizeExt;
+using CMS.MentApi.Untility.Filters;
+using Zhaoxi.Manage.MentApi.Utility.Filters;
 
 namespace CMS.MentApi
 {
@@ -39,7 +41,7 @@ namespace CMS.MentApi
             builder.IniSqlSugar();
             // config cros
             builder.AllCrosDomainsPolicy();
-            
+            builder.Logging.AddLog4Net("CfgFile/log4net.Config");
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IRoleServicce, RoleService>();
             builder.Services.AddScoped<IUserRoleMapService, UserRoleMapService>();
@@ -49,7 +51,10 @@ namespace CMS.MentApi
             builder.Services.AddScoped<IRoleMenuMapService, RoleMenuMapService>();
             builder.Services.AddAutoMapper(typeof(AutoMapperConfigs));
             builder.AddJwtAuthorize();
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options => { 
+                options.Filters.Add<CustomExceptionFilterAttribute>();
+                options.Filters.Add<CustomLog4ActionFilterAttribute>(); 
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.AddSwaggerExt();
             var app = builder.Build();
