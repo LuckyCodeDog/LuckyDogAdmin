@@ -113,10 +113,10 @@ namespace Zhaoxi.Manage.MentApi.Utility.Filters
                 if (jsonResult != null)
                 {
                     logMsgMode.StringResult = Newtonsoft.Json.JsonConvert.SerializeObject(jsonResult.Value);
-                }
+                } 
             }
-            #endregion
-             _logger.LogInformation(Newtonsoft.Json.JsonConvert.SerializeObject(logMsgMode));
+            #endregion 
+            _logger.LogInformation(Newtonsoft.Json.JsonConvert.SerializeObject(logMsgMode));
 
         }
 
