@@ -1,4 +1,4 @@
-### <center>LuckyDogAdim .NET</center>
+### <center>LuckyDogAdim .NET（a totaly advanced version is in buiding(https://github.com/LuckyCodeDog/LuckyDogAdminV2 ) ）</center>
 
 #### ✔Summary
 
